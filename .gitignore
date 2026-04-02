@@ -13,5 +13,3 @@ node_modules/
 
 # Собранные файлы (допишите самостоятельно)
 build/
-dist/
-node_modules/

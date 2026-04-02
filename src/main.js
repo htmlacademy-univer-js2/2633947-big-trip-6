@@ -1,22 +1,15 @@
-/* eslint-disable */
-// Простой тест для проверки Babel
-const testConst = 'Hello World';
-console.log(testConst);
+import NewTaskButtonView from './view/new-task-button-view.js';
+import FilterView from './view/filter-view.js';
+import {render} from './render.js';
+import BoardPresenter from './presenter/board-presenter.js';
 
-const arrowTest = (value) => {
-  return value;
-};
-console.log(arrowTest('Arrow function test'));
+const siteMainElement = document.querySelector('.main');
+const siteHeaderElement = siteMainElement.querySelector('.main__control');
+const boardPresenter = new BoardPresenter({boardContainer: siteMainElement});
+//grgrhtrhthvbfgnyfnyfhbg
+render(new NewTaskButtonView(), siteHeaderElement);
+render(new FilterView(), siteMainElement);
 
-class SimpleClass {
-  constructor(name) {
-    this.name = name;
-  }
+boardPresenter.init();
 
-  greet() {
-    console.log(`Greetings from ${this.name}`);
-  }
-}
-
-const obj = new SimpleClass('Babel');
-obj.greet();
+/* eslint-disable eol-last */
