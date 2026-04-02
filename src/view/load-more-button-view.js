@@ -1,24 +1,24 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createLoadMoreButtonTemplate() {
   return '<button class="load-more" type="button">load more</button>';
 }
 
-export default class LoadMoreButtonView {
-  getTemplate() {
+export default class LoadMoreButtonView extends AbstractView {
+  #handleClick = null;
+
+  constructor({onClick}) {
+    super();
+    this.#handleClick = onClick;
+    this.element.addEventListener('click', this.#clickHandler);
+  }
+
+  get template() {
     return createLoadMoreButtonTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClick();
+  };
 }
-/* eslint-disable eol-last */

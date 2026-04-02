@@ -1,8 +1,8 @@
-import {createElement} from '../render.js';
-import {humanizeTaskDueDate, isTaskExpired} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {humanizeTaskDueDate, isTaskExpired, isTaskRepeating} from '../utils/task.js';
 
 function createTaskTemplate(task) {
-  const {color, description, dueDate} = task;
+  const {color, description, dueDate, repeating, isArchive, isFavorite} = task;
 
   const date = humanizeTaskDueDate(dueDate);
 
@@ -10,20 +10,32 @@ function createTaskTemplate(task) {
     ? 'card--deadline'
     : '';
 
+  const repeatClassName = isTaskRepeating(repeating)
+    ? 'card--repeat'
+    : '';
+
+  const archiveClassName = isArchive
+    ? 'card__btn--archive card__btn--disabled'
+    : 'card__btn--archive';
+
+  const favoriteClassName = isFavorite
+    ? 'card__btn--favorites card__btn--disabled'
+    : 'card__btn--favorites';
+
   return (
-    `<article class="card card--${color} ${deadlineClassName}">
+    `<article class="card card--${color} ${deadlineClassName} ${repeatClassName}">
       <div class="card__form">
         <div class="card__inner">
           <div class="card__control">
             <button type="button" class="card__btn card__btn--edit">
               edit
             </button>
-            <button type="button" class="card__btn card__btn--archive">
+            <button type="button" class="card__btn ${archiveClassName}">
               archive
             </button>
             <button
               type="button"
-              class="card__btn card__btn--favorites"
+              class="card__btn ${favoriteClassName}"
             >
               favorites
             </button>
@@ -56,24 +68,25 @@ function createTaskTemplate(task) {
   );
 }
 
-export default class TaskView {
-  constructor({task}) {
-    this.task = task;
+export default class TaskView extends AbstractView {
+  #task = null;
+  #handleEditClick = null;
+
+  constructor({task, onEditClick}) {
+    super();
+    this.#task = task;
+    this.#handleEditClick = onEditClick;
+
+    this.element.querySelector('.card__btn--edit')
+      .addEventListener('click', this.#editClickHandler);
   }
 
-  getTemplate() {
-    return createTaskTemplate(this.task);
+  get template() {
+    return createTaskTemplate(this.#task);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }
