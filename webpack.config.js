@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/main.js',
 
   output: {
-    filename: 'bundle.[contenthash].js',  // добавляем хэш в имя файла
+    filename: 'bundle.[contenthash].js',
     path: path.resolve(__dirname, 'build'),
     clean: true,
   },
@@ -29,11 +29,10 @@ module.exports = {
   },
 
   plugins: [
-    // HTML плагин для генерации index.html
     new HtmlWebpackPlugin({
-      template: './public/index.html',  // используем существующий HTML как шаблон
-      filename: 'index.html',           // имя выходного файла
-      inject: 'body',                   // вставляем скрипт в body
+      template: './public/index.html',
+      filename: 'index.html',
+      inject: 'body',
     }),
 
     // Copy плагин копирует статические файлы
@@ -42,7 +41,6 @@ module.exports = {
         {
           from: 'public',
           to: '',
-          // исключаем index.html, так как его будет генерировать HtmlWebpackPlugin
           globOptions: {
             ignore: ['**/index.html']
           },
