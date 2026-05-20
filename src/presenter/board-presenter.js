@@ -1,4 +1,5 @@
 import {render, RenderPosition, remove} from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import BoardView from '../view/board-view.js';
 import SortView from '../view/sort-view.js';
 import TaskListView from '../view/task-list-view.js';
@@ -12,6 +13,10 @@ import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 const TASK_COUNT_PER_STEP = 8;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -31,6 +36,10 @@ export default class BoardPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({boardContainer, tasksModel, filterModel, onNewTaskDestroy}) {
     this.#boardContainer = boardContainer;
@@ -90,18 +99,37 @@ export default class BoardPresenter {
     this.#taskPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_TASK:
-        this.#tasksModel.updateTask(updateType, update);
+        this.#taskPresenters.get(update.id).setSaving();
+        try {
+          await this.#tasksModel.updateTask(updateType, update);
+        } catch(err) {
+          this.#taskPresenters.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_TASK:
-        this.#tasksModel.addTask(updateType, update);
+        this.#newTaskPresenter.setSaving();
+        try {
+          await this.#tasksModel.addTask(updateType, update);
+        } catch(err) {
+          this.#newTaskPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_TASK:
-        this.#tasksModel.deleteTask(updateType, update);
+        this.#taskPresenters.get(update.id).setDeleting();
+        try {
+          await this.#tasksModel.deleteTask(updateType, update);
+        } catch(err) {
+          this.#taskPresenters.get(update.id).setAborting();
+        }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
