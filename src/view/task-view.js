@@ -1,20 +1,42 @@
-import {createElement} from '../render.js';
+import he from 'he';
+import AbstractView from '../framework/view/abstract-view.js';
+import {humanizeTaskDueDate, isTaskExpired, isTaskRepeating} from '../utils/task.js';
 
-function createTaskTemplate() {
+function createTaskTemplate(task) {
+  const {color, description, dueDate, repeating, isArchive, isFavorite} = task;
+
+  const date = humanizeTaskDueDate(dueDate);
+
+  const deadlineClassName = isTaskExpired(dueDate)
+    ? 'card--deadline'
+    : '';
+
+  const repeatClassName = isTaskRepeating(repeating)
+    ? 'card--repeat'
+    : '';
+
+  const archiveClassName = isArchive
+    ? 'card__btn--archive card__btn--disabled'
+    : 'card__btn--archive';
+
+  const favoriteClassName = isFavorite
+    ? 'card__btn--favorites card__btn--disabled'
+    : 'card__btn--favorites';
+
   return (
-    `<article class="card card--black">
+    `<article class="card card--${color} ${deadlineClassName} ${repeatClassName}">
       <div class="card__form">
         <div class="card__inner">
           <div class="card__control">
             <button type="button" class="card__btn card__btn--edit">
               edit
             </button>
-            <button type="button" class="card__btn card__btn--archive">
+            <button type="button" class="card__btn ${archiveClassName}">
               archive
             </button>
             <button
               type="button"
-              class="card__btn card__btn--favorites"
+              class="card__btn ${favoriteClassName}"
             >
               favorites
             </button>
@@ -27,7 +49,7 @@ function createTaskTemplate() {
           </div>
 
           <div class="card__textarea-wrap">
-            <p class="card__text">Example default task with default color.</p>
+            <p class="card__text">${he.encode(description)}</p>
           </div>
 
           <div class="card__settings">
@@ -35,7 +57,7 @@ function createTaskTemplate() {
               <div class="card__dates">
                 <div class="card__date-deadline">
                   <p class="card__input-deadline-wrap">
-                    <span class="card__date">23 September</span>
+                    <span class="card__date">${date}</span>
                   </p>
                 </div>
               </div>
@@ -47,21 +69,43 @@ function createTaskTemplate() {
   );
 }
 
-export default class TaskView {
-  getTemplate() {
-    return createTaskTemplate();
+export default class TaskView extends AbstractView {
+  #task = null;
+  #handleEditClick = null;
+  #handleFavoriteClick = null;
+  #handleArchiveClick = null;
+
+  constructor({task, onEditClick, onFavoriteClick, onArchiveClick}) {
+    super();
+    this.#task = task;
+    this.#handleEditClick = onEditClick;
+    this.#handleFavoriteClick = onFavoriteClick;
+    this.#handleArchiveClick = onArchiveClick;
+
+    this.element.querySelector('.card__btn--edit')
+      .addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('.card__btn--favorites')
+      .addEventListener('click', this.#favoriteClickHandler);
+    this.element.querySelector('.card__btn--archive')
+      .addEventListener('click', this.#archiveClickHandler);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+  get template() {
+    return createTaskTemplate(this.#task);
   }
 
-  removeElement() {
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
+  };
+
+  #archiveClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleArchiveClick();
+  };
 }
-/* eslint-disable eol-last */
