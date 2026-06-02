@@ -1,16 +1,13 @@
+// Модель для хранения и управления состоянием активного фильтра
+
 import Observable from '../framework/observable.js';
 import {FilterType} from '../const.js';
-
-// Модель для хранения и управления состоянием активного фильтра.
 
 export default class FilterModel extends Observable {
   // Текущий тип фильтра. По умолчанию показаны все точки.
   #filter = FilterType.EVERYTHING;
 
-  /**
-   * Геттер возвращает текущее значение фильтра.
-   * @returns {string} Тип фильтра (everything, future, present, past)
-   */
+  // Геттер возвращает текущее значение фильтра.
   get filter() {
     return this.#filter;
   }
