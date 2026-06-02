@@ -2,7 +2,7 @@
   "name": "big-trip",
   "version": "22.0.0",
   "private": true,
-  "description": "Проект «Большое путешествие» от HTML Academy",
+  "description": "Проект «Большое путешествие» от HTML Academyyyyy",
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack serve --mode development",
