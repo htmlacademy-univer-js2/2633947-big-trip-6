@@ -22,7 +22,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        run: npm install --legacy-peer-deps
+        npm install --legacy-peer-deps
 
     - name: Run checks
       run: |
