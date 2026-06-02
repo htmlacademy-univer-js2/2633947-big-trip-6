@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
-import {POINT_TYPES} from '../const.js';
+import {TRIP_TYPES} from '../const.js';
 import {humanizeFullDate} from '../utils/date.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
@@ -28,7 +28,7 @@ function createEditPointTemplate(point, destinations, offers) {
   const destinationDescription = pointDestination ? pointDestination.description : '';
   const destinationPictures = pointDestination ? pointDestination.pictures : [];
 
-  const typeList = POINT_TYPES.map((pointType) => `
+  const typeList = TRIP_TYPES.map((pointType) => `
     <div class="event__type-item">
       <input id="event-type-${pointType}-${pointId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}" ${pointType === type ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
       <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${pointId}">${pointType.charAt(0).toUpperCase() + pointType.slice(1)}</label>

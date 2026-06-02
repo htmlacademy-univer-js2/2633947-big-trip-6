@@ -1,4 +1,4 @@
-const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+const TRIP_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 const SortType = {
   DAY: 'day',
@@ -28,4 +28,4 @@ const FilterType = {
   PAST: 'past',
 };
 
-export {POINT_TYPES, SortType, UserAction, UpdateType, FilterType};
+export {TRIP_TYPES, SortType, UserAction, UpdateType, FilterType};
