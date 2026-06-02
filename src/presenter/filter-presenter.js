@@ -1,30 +1,30 @@
-import {render, replace, remove} from '../framework/render.js';
 import FilterView from '../view/filter-view.js';
-import {filter} from '../utils/filter.js';
+import {render, replace, remove} from '../framework/render.js';
 import {FilterType, UpdateType} from '../const.js';
+import {filter} from '../utils/filter.js';
 
 export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
-  #tasksModel = null;
+  #pointsModel = null;
 
   #filterComponent = null;
 
-  constructor({filterContainer, filterModel, tasksModel}) {
+  constructor({filterContainer, filterModel, pointsModel}) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
-    this.#tasksModel = tasksModel;
+    this.#pointsModel = pointsModel;
 
-    this.#tasksModel.addObserver(this.#handleModelEvent);
+    this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get filters() {
-    const tasks = this.#tasksModel.tasks;
+    const points = this.#pointsModel.points;
 
     return Object.values(FilterType).map((type) => ({
       type,
-      count: filter[type](tasks).length
+      count: filter[type](points).length,
     }));
   }
 
