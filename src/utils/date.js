@@ -1,24 +1,32 @@
+// Утилиты для форматирования дат, времени и длительности событий
+
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
+// Подключаем плагин для работы с длительностью
 dayjs.extend(duration);
 
+// Форматы дат
 const DATE_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
 const FULL_DATE_FORMAT = 'DD/MM/YY HH:mm';
 
+// Преобразует дату в формат "MMM D" (например, "May 22")
 function humanizePointDate(date) {
   return date ? dayjs(date).format(DATE_FORMAT) : '';
 }
 
+// Преобразует дату в формат времени "HH:mm"
 function humanizePointTime(date) {
   return date ? dayjs(date).format(TIME_FORMAT) : '';
 }
 
+// Преобразует дату в полный формат "DD/MM/YY HH:mm"
 function humanizeFullDate(date) {
   return date ? dayjs(date).format(FULL_DATE_FORMAT) : '';
 }
 
+// Вычисляет длительность между двумя датами и форматирует в "DDD HHH MMM" или "HH MMM" или "MMM"
 function getPointDuration(dateFrom, dateTo) {
   const start = dayjs(dateFrom);
   const end = dayjs(dateTo);
@@ -45,6 +53,8 @@ function getPointDuration(dateFrom, dateTo) {
   return formattedDuration;
 }
 
+// Форматирует даты начала и окончания путешествия для шапки
+// Если месяц одинаковый, показывает "D — D MMM", иначе "D MMM — D MMM"
 function formatTripDates(dateFrom, dateTo) {
   const start = dayjs(dateFrom);
   const end = dayjs(dateTo);
@@ -56,6 +66,7 @@ function formatTripDates(dateFrom, dateTo) {
   return `${start.format('D MMM')}&nbsp;&mdash;&nbsp;${end.format('D MMM')}`;
 }
 
+// Экспорт всех функций
 export {
   humanizePointDate,
   humanizePointTime,

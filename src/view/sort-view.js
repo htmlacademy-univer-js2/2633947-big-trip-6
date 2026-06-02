@@ -1,6 +1,9 @@
+// Компонент сортировки точек маршрута (по дню, времени, цене)
+
 import AbstractView from '../framework/view/abstract-view.js';
 import {SortType} from '../const.js';
 
+// Генерирует HTML разметку формы сортировки
 function createSortTemplate(currentSortType) {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -41,6 +44,7 @@ export default class SortView extends AbstractView {
     this.#currentSortType = currentSortType;
     this.#handleSortTypeChange = onSortTypeChange;
 
+    // Слушаем событие change на всей форме сортировки
     this.element.addEventListener('change', this.#sortTypeChangeHandler);
   }
 
@@ -48,6 +52,7 @@ export default class SortView extends AbstractView {
     return createSortTemplate(this.#currentSortType);
   }
 
+  // Обработчик изменения выбранной сортировки
   #sortTypeChangeHandler = (evt) => {
     if (evt.target.tagName !== 'INPUT') {
       return;

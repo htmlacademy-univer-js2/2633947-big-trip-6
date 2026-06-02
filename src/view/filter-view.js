@@ -1,5 +1,8 @@
+// Компонент блока фильтров (радиокнопки Everything, Future, Present, Past)
+
 import AbstractView from '../framework/view/abstract-view.js';
 
+// Генерирует HTML для одного фильтра (радиокнопка с лейблом)
 function createFilterItemTemplate(filter, currentFilterType) {
   const {type, count} = filter;
 
@@ -19,6 +22,7 @@ function createFilterItemTemplate(filter, currentFilterType) {
   );
 }
 
+// Генерирует полную HTML разметку формы фильтров
 function createFilterTemplate(filters, currentFilterType) {
   const filterItemsTemplate = filters
     .map((filter) => createFilterItemTemplate(filter, currentFilterType))
@@ -43,6 +47,7 @@ export default class FilterView extends AbstractView {
     this.#currentFilterType = currentFilterType;
     this.#handleFilterTypeChange = onFilterTypeChange;
 
+    // Слушаем событие change на контейнере фильтров
     this.element.addEventListener('change', this.#filterTypeChangeHandler);
   }
 
@@ -50,6 +55,7 @@ export default class FilterView extends AbstractView {
     return createFilterTemplate(this.#filters, this.#currentFilterType);
   }
 
+  // Обработчик изменения выбранного фильтра
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
     this.#handleFilterTypeChange(evt.target.value);

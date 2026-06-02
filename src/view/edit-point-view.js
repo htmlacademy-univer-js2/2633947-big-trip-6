@@ -1,3 +1,5 @@
+// Компонент формы редактирования и создания точки маршрута
+
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 import {TRIP_TYPES} from '../const.js';
@@ -5,6 +7,7 @@ import {humanizeFullDate} from '../utils/date.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
+// Пустая точка маршрута для создания новой
 const BLANK_POINT = {
   basePrice: 0,
   dateFrom: null,
@@ -15,19 +18,22 @@ const BLANK_POINT = {
   type: 'flight'
 };
 
+// Генерирует HTML разметку формы
 function createEditPointTemplate(point, destinations, offers) {
   const {basePrice, dateFrom, dateTo, type, isDisabled, isSaving, isDeleting, id} = point;
-  // unique suffix for IDs
   const pointId = id || 'new';
 
+  // Находим выбранное направление и опции для текущего типа
   const pointDestination = destinations.find((dest) => dest.id === point.destination);
   const pointTypeOffers = offers.find((offer) => offer.type === type);
   const currentPointOffers = pointTypeOffers ? pointTypeOffers.offers : [];
 
+  // Данные о направлении
   const destinationName = pointDestination ? pointDestination.name : '';
   const destinationDescription = pointDestination ? pointDestination.description : '';
   const destinationPictures = pointDestination ? pointDestination.pictures : [];
 
+  // Генерация радиокнопок типов событий
   const typeList = TRIP_TYPES.map((pointType) => `
     <div class="event__type-item">
       <input id="event-type-${pointType}-${pointId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}" ${pointType === type ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
@@ -35,6 +41,7 @@ function createEditPointTemplate(point, destinations, offers) {
     </div>
   `).join('');
 
+  // Генерация чекбоксов дополнительных опций
   const offersList = currentPointOffers.map((offer) => {
     const isChecked = point.offers.includes(offer.id) ? 'checked' : '';
     return `
@@ -49,12 +56,15 @@ function createEditPointTemplate(point, destinations, offers) {
     `;
   }).join('');
 
+  // Генерация опций для datalist направлений
   const destinationOptions = destinations.map((dest) => `<option value="${dest.name}"></option>`).join('');
 
+  // Генерация фотографий направления
   const picturesList = destinationPictures.map((pic) => `
     <img class="event__photo" src="${pic.src}" alt="${pic.description}">
   `).join('');
 
+  // Текст кнопки сброса (Delete/Cancel)
   let resetButtonLabel;
   if (point.id) {
     resetButtonLabel = isDeleting ? 'Deleting...' : 'Delete';
@@ -173,6 +183,7 @@ export default class EditPointView extends AbstractStatefulView {
     return createEditPointTemplate(this._state, this.#pointDestinations, this.#pointOffers);
   }
 
+  // При удалении компонента уничтожаем экземпляры календарей
   removeElement() {
     super.removeElement();
 
@@ -187,12 +198,14 @@ export default class EditPointView extends AbstractStatefulView {
     }
   }
 
+  // Сбрасывает форму к исходному состоянию (после успешного сохранения)
   reset(point) {
     this.updateElement(
       EditPointView.parsePointToState(point),
     );
   }
 
+  // Восстанавливает обработчики событий после перерисовки компонента
   _restoreHandlers() {
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
     const rollupBtn = this.element.querySelector('.event__rollup-btn');
@@ -212,15 +225,16 @@ export default class EditPointView extends AbstractStatefulView {
     this.#setDatepicker();
   }
 
+  // Обработчик смены типа события
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
-
     this.updateElement({
       type: evt.target.value,
       offers: [],
     });
   };
 
+  // Обработчик выбора направления
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
     const selectedDestination = this.#pointDestinations.find((dest) => dest.name === evt.target.value);
@@ -235,17 +249,18 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
+  // Обработчик изменения выбранных опций (чекбоксы)
   #offerChangeHandler = (evt) => {
     if (evt.target.tagName !== 'INPUT') {
       return;
     }
-
     const checkedBoxes = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
     this._setState({
       offers: checkedBoxes.map((element) => element.dataset.offerId)
     });
   };
 
+  // Обработчик изменения цены
   #priceInputHandler = (evt) => {
     evt.preventDefault();
     this._setState({
@@ -253,33 +268,39 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
+  // Отправка формы (сохранение)
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSubmit(EditPointView.parseStateToPoint(this._state));
   };
 
+  // Закрытие формы через кнопку-стрелку
   #formClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormClick();
   };
 
+  // Удаление точки или отмена создания
   #formDeleteClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleDeleteClick(EditPointView.parseStateToPoint(this._state));
   };
 
+  // Обработчик изменения даты начала (от flatpickr)
   #dateFromChangeHandler = ([userDate]) => {
     this.updateElement({
       dateFrom: userDate,
     });
   };
 
+  // Обработчик изменения даты окончания (от flatpickr)
   #dateToChangeHandler = ([userDate]) => {
     this.updateElement({
       dateTo: userDate,
     });
   };
 
+  // Инициализация календарей flatpickr
   #setDatepicker() {
     const pointId = this._state.id || 'new';
     this.#datepickerFrom = flatpickr(
@@ -304,6 +325,7 @@ export default class EditPointView extends AbstractStatefulView {
     );
   }
 
+  // Преобразует точку из формата клиента в формат состояния компонента
   static parsePointToState(point) {
     return {...point,
       isDisabled: false,
@@ -312,13 +334,12 @@ export default class EditPointView extends AbstractStatefulView {
     };
   }
 
+  // Преобразует состояние компонента обратно в формат точки
   static parseStateToPoint(state) {
     const point = {...state};
-
     delete point.isDisabled;
     delete point.isSaving;
     delete point.isDeleting;
-
     return point;
   }
 }

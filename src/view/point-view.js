@@ -1,6 +1,9 @@
+// Компонент карточки точки маршрута в режиме просмотра
+
 import AbstractView from '../framework/view/abstract-view.js';
 import {humanizePointDate, humanizePointTime, getPointDuration} from '../utils/date.js';
 
+// Генерирует HTML разметку карточки точки маршрута
 function createPointTemplate(point, destinations, offers) {
   const {basePrice, dateFrom, dateTo, isFavorite, type} = point;
   const pointDestination = destinations.find((dest) => dest.id === point.destination);
@@ -70,6 +73,7 @@ export default class PointView extends AbstractView {
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
+    // Добавляем обработчики после рендера
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
     this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
   }
@@ -78,11 +82,13 @@ export default class PointView extends AbstractView {
     return createPointTemplate(this.#point, this.#pointDestinations, this.#pointOffers);
   }
 
+  // Обработчик клика по кнопке открытия формы редактирования
   #editClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleEditClick();
   };
 
+  // Обработчик клика по кнопке избранного
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleFavoriteClick();
