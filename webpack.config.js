@@ -1,6 +1,6 @@
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
-const HtmlPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
@@ -11,36 +11,35 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
-    new HtmlPlugin({
-      template: 'public/index.html',
-    }),
     new CopyPlugin({
       patterns: [
-        {
-          from: 'public',
+        { from: 'public', to: 'build',
           globOptions: {
             ignore: ['**/index.html'],
           },
         },
       ],
     }),
+    new HtmlWebpackPlugin({
+      template: 'public/index.html',
+    }),
   ],
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        exclude: /(node_modules)/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env']
-          },
+        {
+          test: /\.js$/,
+          exclude: /(node_modules)/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env']
+            }
+          }
         },
-      },
-      {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader']
-      },
-    ],
-  },
+        {
+          test: /\.css$/i,
+          use: ['style-loader', 'css-loader'],
+        },
+    ]
+  }
 };

@@ -1,57 +1,63 @@
+// Компонент блока фильтров (радиокнопки Everything, Future, Present, Past)
+
 import AbstractView from '../framework/view/abstract-view.js';
 
+// Генерирует HTML для одного фильтра (радиокнопка с лейблом)
 function createFilterItemTemplate(filter, currentFilterType) {
   const {type, count} = filter;
 
   return (
-    `<input
-      type="radio"
-      id="filter__${type}"
-      class="filter__input visually-hidden"
-      name="filter"
-      ${type === currentFilterType ? 'checked' : ''}
-      ${count === 0 ? 'disabled' : ''}
-      value="${type}"
-    />
-    <label for="filter__${type}" class="filter__label">
-      ${type} <span class="filter__${type}-count">${count}</span></label
-    >`
+    `<div class="trip-filters__filter">
+      <input
+        id="filter-${type}"
+        class="trip-filters__filter-input  visually-hidden"
+        type="radio"
+        name="trip-filter"
+        value="${type}"
+        ${type === currentFilterType ? 'checked' : ''}
+        ${count === 0 ? 'disabled' : ''}
+      >
+      <label class="trip-filters__filter-label" for="filter-${type}">${type}</label>
+    </div>`
   );
 }
 
-function createFilterTemplate(filterItems, currentFilterType) {
-  const filterItemsTemplate = filterItems
+// Генерирует полную HTML разметку формы фильтров
+function createFilterTemplate(filters, currentFilterType) {
+  const filterItemsTemplate = filters
     .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('');
 
   return (
-    `<section class="main__filter filter container">
+    `<form class="trip-filters" action="#" method="get">
       ${filterItemsTemplate}
-    </section>`
+      <button class="visually-hidden" type="submit">Accept filter</button>
+    </form>`
   );
 }
 
 export default class FilterView extends AbstractView {
   #filters = null;
-  #currentFilter = null;
+  #currentFilterType = null;
   #handleFilterTypeChange = null;
 
   constructor({filters, currentFilterType, onFilterTypeChange}) {
     super();
     this.#filters = filters;
-    this.#currentFilter = currentFilterType;
+    this.#currentFilterType = currentFilterType;
     this.#handleFilterTypeChange = onFilterTypeChange;
 
+    // Слушаем событие change на контейнере фильтров
     this.element.addEventListener('change', this.#filterTypeChangeHandler);
   }
 
   get template() {
-    return createFilterTemplate(this.#filters, this.#currentFilter);
+    return createFilterTemplate(this.#filters, this.#currentFilterType);
   }
 
+  // Обработчик изменения выбранного фильтра
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
     this.#handleFilterTypeChange(evt.target.value);
   };
-
 }
